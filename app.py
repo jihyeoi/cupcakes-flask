@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, redirect, render_template
+from flask import Flask, jsonify, request
 # from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Cupcake
@@ -23,3 +23,38 @@ app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # debug = DebugToolbarExtension(app)
+
+@app.get('/api/cupcakes')
+def get_all_cupcakes():
+    """Returns JSON with list of all cupcakes and their corresponding data"""
+
+    cupcakes = Cupcake.query.all()
+    serialized_cupcakes = [c.serialize() for c in cupcakes]
+
+    return jsonify(cupcakes = serialized_cupcakes)
+
+
+@app.get('/api/cupcakes/<int:cupcake_id>')
+def get_single_cupcake(cupcake_id):
+    """Returns JSON data about single cupcake"""
+
+    cupcake = Cupcake.query.get(cupcake_id)
+    return jsonify(cupcake = cupcake.serialize())
+
+@app.post('/api/cupcakes')
+def add_cupcake():
+    """Adds cupcake to database and returns JSON with new cupcake data"""
+
+    new_cupcake = Cupcake(
+        flavor = request.json['flavor'],
+        size = request.json['size'],
+        rating = request.json['rating'],
+        image_url = request.json['image_url']
+    )
+
+    db.session.add(new_cupcake)
+    db.session.commit()
+
+    return (jsonify(cupcake = new_cupcake.serialize()), 201)
+
+
