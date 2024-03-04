@@ -1,11 +1,10 @@
+from models import db, Cupcake, DEFAULT_IMG_URL
+from app import app
+from unittest import TestCase
 import os
 
 os.environ["DATABASE_URL"] = 'postgresql:///cupcakes_test'
 
-from unittest import TestCase
-
-from app import app
-from models import db, Cupcake
 
 # Make Flask errors be real errors, rather than HTML pages with error info
 app.config['TESTING'] = True
@@ -105,3 +104,43 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 2)
+
+    def test_delete_cupcake(self):
+        """Tests deleting cupcake"""
+
+        with app.test_client() as client:
+            count_before = Cupcake.query.count()
+            url = f"/api/cupcakes/{self.cupcake_id}"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 200)
+
+            self.assertEqual(resp.json, {
+                "deleted": [self.cupcake_id]
+            })
+
+            self.assertEqual(Cupcake.query.count(), count_before - 1)
+
+    def test_update_cupcake(self):
+        """Tests updating cupcake"""
+
+        with app.test_client() as client:
+            url = f"/api/cupcakes/{self.cupcake_id}"
+            resp = client.patch(url, json = {
+                "flavor": "choco",
+                "size": "huge",
+                'image_url': ""
+            })
+            self.assertEqual(resp.status_code, 200)
+            data = resp.json
+            self.assertEqual(data, {
+                "cupcake": {
+                    "id": self.cupcake_id,
+                    "flavor": "choco",
+                    "size": "huge",
+                    "rating": 5,
+                    "image_url": DEFAULT_IMG_URL
+                }
+            })
+
+
