@@ -26,7 +26,12 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 @app.get('/api/cupcakes')
 def get_all_cupcakes():
-    """Returns JSON with list of all cupcakes and their corresponding data"""
+    """Returns JSON with list of all cupcakes and their corresponding data
+    {cupcakes: [
+        so on
+    ]}
+    """
+    # TODO: add "shape" of the data
 
     cupcakes = Cupcake.query.all()
     serialized_cupcakes = [c.serialize() for c in cupcakes]
@@ -38,7 +43,7 @@ def get_all_cupcakes():
 def get_single_cupcake(cupcake_id):
     """Returns JSON data about single cupcake"""
 
-    cupcake = Cupcake.query.get(cupcake_id)
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
     return jsonify(cupcake = cupcake.serialize())
 
 @app.post('/api/cupcakes')
@@ -49,7 +54,7 @@ def add_cupcake():
         flavor = request.json['flavor'],
         size = request.json['size'],
         rating = request.json['rating'],
-        image_url = request.json['image_url']
+        image_url = request.json['image_url'] or None
     )
 
     db.session.add(new_cupcake)
@@ -58,3 +63,15 @@ def add_cupcake():
     return (jsonify(cupcake = new_cupcake.serialize()), 201)
 
 
+# @app.patch('/api/cupcakes/<int:cupcake_id>')
+# def update_cupcake(cupcake_id):
+#     """Updates cupcake and returns JSON with updated cupcake information"""
+
+#     cupcake = Cupcake.query.get_or_404(cupcake_id)
+#     ...
+
+# @app.delete('/api/cupcakes/<int:cupcake_id>')
+# def delete_cupcake(cupcake_id):
+#     """Delete cupcake and returns JSON with id of deleted cupcake"""
+
+#     cupcake = Cupcake.query.get_or_404(cupcake_id)
