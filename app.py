@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 # from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Cupcake, DEFAULT_IMG_URL
@@ -151,3 +151,9 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted=[cupcake_id])
+
+
+@app.get("/")
+def show_homepage():
+
+    return render_template("homepage.html")
