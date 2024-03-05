@@ -12,7 +12,7 @@ const BASE_URL = "http://127.0.0.1:5000";
 /** Makes request to API, returns list of all cupcakes */
 async function getCupcakeList() {
   const response = await fetch(`${BASE_URL}/api/cupcakes`);
-  const responseObj = await response.json();
+  const responseObj = await response.json(); //TODO: data
 
   return responseObj["cupcakes"];
 }
@@ -31,14 +31,15 @@ async function getCupcakesAndUpdateUi() {
   updateCupcakeListUi(cupcakes);
 }
 
+/** Formats cupcake info and adds it to UI */
 function addCupcakeToUi(cupcake) {
   const $cupcake = $(`<li>${cupcake.flavor} is a ${cupcake.size} and is rated
-                    ${cupcake.rating}. Here is a photo: <img src='${cupcake.image_url}'</li>`);
+                    ${cupcake.rating}. Here is a photo: <img src='${cupcake.image_url}'></li>`);
 
   $cupcakeList.append($cupcake);
 }
 
-
+/** Upon form submit, requests information from API and adds to UI, resets form */
 async function handleFormSubmit(evt) {
   evt.preventDefault();
 
@@ -54,7 +55,7 @@ async function handleFormSubmit(evt) {
   $cupcakeForm.trigger('reset');
 }
 
-
+/** submits form information to API, reuturns cupcake object */
 async function addNewCupcakeRequest(form_inputs) {
   const response = await fetch(`${BASE_URL}/api/cupcakes`, {
     method: "POST",
